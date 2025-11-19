@@ -3,7 +3,8 @@ package henrique.igor.restaurantmanagementapi.errors;
 public enum ExceptionCode {
     ENTITY_NOT_FOUND,
     DUPLICATED_RESOURCE,
-    USERNAME_ALREADY_EXISTS;
+    USERNAME_ALREADY_EXISTS,
+    INVALID_ACTIVATION_CODE;
 
 
     public String getExceptionIndex(){
