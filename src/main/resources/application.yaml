@@ -6,3 +6,6 @@ spring:
     driver-class-name: org.postgresql.Driver
   flyway:
     locations: classpath:db/migration
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
