@@ -6,7 +6,8 @@ public enum ExceptionCode {
     USERNAME_ALREADY_EXISTS,
     INVALID_ACTIVATION_CODE,
     INTERNAL_SERVER_ERROR,
-    UNAUTHORIZED;
+    UNAUTHORIZED,
+    BAD_CREDENTIALS;
 
 
     public String getExceptionIndex(){

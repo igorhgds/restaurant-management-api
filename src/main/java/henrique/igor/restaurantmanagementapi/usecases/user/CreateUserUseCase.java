@@ -3,13 +3,16 @@ package henrique.igor.restaurantmanagementapi.usecases.user;
 import henrique.igor.restaurantmanagementapi.entities.User;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.CreateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.UserResponseDTO;
+import henrique.igor.restaurantmanagementapi.enums.UserRole;
 import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.mapper.user.UserStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
-import henrique.igor.restaurantmanagementapi.services.EmailService;
-import henrique.igor.restaurantmanagementapi.services.RandomCodeService;
+import henrique.igor.restaurantmanagementapi.security.dto.UserDetailsDTO;
+import henrique.igor.restaurantmanagementapi.services.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +27,13 @@ public class CreateUserUseCase {
     private final RandomCodeService randomCodeService;
     private final UserStructMapper userMapper;
     private final EmailService emailService;
+    private final AuthenticationContextService authService;
 
+    @Transactional
     public UserResponseDTO createUser(CreateUserRequestDTO request) {
-        var currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var loggedUser = authService.getAutheticatedUser();
+
+        this.validateRoleHierarchy(loggedUser.getUserRole(), request.userRole());
 
         Map<String, String> errors = new HashMap<>();
         if(userRepository.findByUsername(request.username()).isPresent())
@@ -35,8 +42,6 @@ public class CreateUserUseCase {
             errors.put("email", "user.email.duplicate");
         if (!errors.isEmpty())
             throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, errors);
-
-        //TODO - validations for users created by role
 
         var temporaryCode = randomCodeService.generate(6);
         User user = userMapper.toEntity(request);
@@ -47,5 +52,9 @@ public class CreateUserUseCase {
         return userMapper.toUserResponseDTO(userRepository.save(user));
     }
 
-    private void validateRoleHierarchy(){}
+    private void validateRoleHierarchy(UserRole currentRole, UserRole requestedRole){
+        if (currentRole.equals(UserRole.ADMIN)) return;
+        if (currentRole.equals(UserRole.MANAGER) && !requestedRole.equals(UserRole.ADMIN)) return;
+        throw new BusinessRuleException(ExceptionCode.UNAUTHORIZED);
+    }
 }
