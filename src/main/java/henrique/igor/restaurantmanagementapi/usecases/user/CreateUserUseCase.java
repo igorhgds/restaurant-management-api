@@ -10,6 +10,7 @@ import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository
 import henrique.igor.restaurantmanagementapi.services.EmailService;
 import henrique.igor.restaurantmanagementapi.services.RandomCodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,6 +26,8 @@ public class CreateUserUseCase {
     private final EmailService emailService;
 
     public UserResponseDTO createUser(CreateUserRequestDTO request) {
+        var currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         Map<String, String> errors = new HashMap<>();
         if(userRepository.findByUsername(request.username()).isPresent())
             errors.put("username", "user.username.duplicate");
@@ -33,8 +36,9 @@ public class CreateUserUseCase {
         if (!errors.isEmpty())
             throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, errors);
 
-        var temporaryCode = randomCodeService.generate(6);
+        //TODO - validations for users created by role
 
+        var temporaryCode = randomCodeService.generate(6);
         User user = userMapper.toEntity(request);
         user.setPasswordRecoveryCode(temporaryCode);
 
@@ -42,4 +46,6 @@ public class CreateUserUseCase {
 
         return userMapper.toUserResponseDTO(userRepository.save(user));
     }
+
+    private void validateRoleHierarchy(){}
 }

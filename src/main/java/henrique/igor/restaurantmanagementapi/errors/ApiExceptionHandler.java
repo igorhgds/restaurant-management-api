@@ -1,7 +1,6 @@
 package henrique.igor.restaurantmanagementapi.errors;
 
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
-import henrique.igor.restaurantmanagementapi.errors.exceptions.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -21,6 +20,23 @@ import java.util.Map;
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final MessageSource messageSource;
+
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<Object> handlerBusinessRuleException(BusinessRuleException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        if (exception.getCode() == ExceptionCode.DUPLICATED_RESOURCE) {
+            status = HttpStatus.CONFLICT;
+        } else if (exception.getCode() == ExceptionCode.ENTITY_NOT_FOUND) {
+            status = HttpStatus.NOT_FOUND;
+        }
+
+        ErrorResponse body = buildErrorResponse(status, exception.getCode(), exception.getDetails());
+
+        log.error("Business Error: [Code: {}] - [Details: {}]", body.getCode(), body.getDetails());
+        return handleExceptionInternal(exception, body, new HttpHeaders(), status, request);
+    }
 
     private ErrorResponse buildErrorResponse(HttpStatus status, ExceptionCode exceptionCode, Object details) {
         String message;
@@ -57,23 +73,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return translatedMap;
     }
-
-    @ExceptionHandler(BusinessRuleException.class)
-    public ResponseEntity<Object> handlerBusinessRuleException(BusinessRuleException exception, WebRequest request) {
-        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-
-        if (exception.getCode() == ExceptionCode.DUPLICATED_RESOURCE) {
-            status = HttpStatus.CONFLICT;
-        } else if (exception.getCode() == ExceptionCode.ENTITY_NOT_FOUND) {
-            status = HttpStatus.NOT_FOUND;
-        }
-
-        ErrorResponse body = buildErrorResponse(status, exception.getCode(), exception.getDetails());
-
-        log.error("Business Error: [Code: {}] - [Details: {}]", body.getCode(), body.getDetails());
-        return handleExceptionInternal(exception, body, new HttpHeaders(), status, request);
-    }
-
 }
 
 

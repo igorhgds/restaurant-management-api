@@ -4,7 +4,9 @@ public enum ExceptionCode {
     ENTITY_NOT_FOUND,
     DUPLICATED_RESOURCE,
     USERNAME_ALREADY_EXISTS,
-    INVALID_ACTIVATION_CODE;
+    INVALID_ACTIVATION_CODE,
+    INTERNAL_SERVER_ERROR,
+    UNAUTHORIZED;
 
 
     public String getExceptionIndex(){

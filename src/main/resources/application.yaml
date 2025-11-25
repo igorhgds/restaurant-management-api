@@ -9,3 +9,8 @@ spring:
   messages:
     basename: i18n/messages
     encoding: UTF-8
+custom:
+  jwt:
+    secret: ${JWT_SECRET:changeMeToAStrongSecret}
+    expiration: ${JWT_EXPIRATION:3600} # 60 minutos
+    issuer: ${JWT_ISSUER:Restaurant Project API}

@@ -1,4 +1,4 @@
-package henrique.igor.restaurantmanagementapi.errors.exceptions;
+package henrique.igor.restaurantmanagementapi.errors;
 
 import lombok.*;
 
