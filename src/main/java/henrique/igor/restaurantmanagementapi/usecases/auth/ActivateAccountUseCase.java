@@ -6,6 +6,7 @@ import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class ActivateAccountUseCase {
 
     private final UserJpaRepository userRepository;
-    //TODO BCrypt
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public void activateAccount(ActivateAccountRequestDTO request){
         User user = userRepository.findByEmail(request.email())
@@ -24,7 +25,7 @@ public class ActivateAccountUseCase {
         }
 
         user.setPasswordRecoveryCode(null);
-        user.setPassword(request.password());
+        user.setPassword(passwordEncoder.encode(request.password()));
         user.setEnabled(true);
 
         userRepository.save(user);

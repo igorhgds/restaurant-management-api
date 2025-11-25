@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users(
     user_id                     UUID            PRIMARY KEY,
     username                    VARCHAR(150)    NOT NULL,
     email                       VARCHAR(150)    NOT NULL,
-    password                    VARCHAR(20),
+    password                    VARCHAR(60),
     password_recovery_code      VARCHAR(6),
     user_role                   VARCHAR(50)     NOT NULL,
     is_enabled                  BOOLEAN         NOT NULL,

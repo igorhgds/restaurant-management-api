@@ -9,9 +9,7 @@ import henrique.igor.restaurantmanagementapi.mapper.user.UserStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
 import henrique.igor.restaurantmanagementapi.services.EmailService;
 import henrique.igor.restaurantmanagementapi.services.RandomCodeService;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -35,14 +33,9 @@ public class CreateUserUseCase {
         if (!errors.isEmpty())
             throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, errors);
 
-
         var temporaryCode = randomCodeService.generate(6);
 
         User user = userMapper.toEntity(request);
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setUserRole(request.userRole());
-        user.setPassword(null);
         user.setPasswordRecoveryCode(temporaryCode);
 
         emailService.sendActivationEmail(user.getEmail(), temporaryCode);
