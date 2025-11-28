@@ -16,4 +16,13 @@ public class MockEmailService implements EmailService {
         log.info("[EMAIL MOCK] Corpo: Olá! Seu código de ativação é: {}", activationCode);
         log.info("--------------------------------------------------");
     }
+
+    @Override
+    public void sendRecoveryCode(String destinationEmail, String activationCode) {
+        log.info("--------------------------------------------------");
+        log.info("[EMAIL MOCK] Enviando email para: {}", destinationEmail);
+        log.info("[EMAIL MOCK] Assunto: Código para alterar senha");
+        log.info("[EMAIL MOCK] Corpo: Olá! Seu código de ativação é: {}", activationCode);
+        log.info("--------------------------------------------------");
+    }
 }
