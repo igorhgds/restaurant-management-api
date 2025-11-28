@@ -56,3 +56,29 @@ $ cd restaurant-management-api
 $ mvn spring-boot:run
 ```
 Desenvolvido por Igor Henrique Gomes
+
+---
+
+### 💡 O Toque de Mestre (Diagrama Automático)
+
+Disseste que querias um diagrama. Sabias que o GitHub renderiza diagramas **Mermaid.js** nativamente? Não precisas de desenhar no Photoshop!
+
+Podes adicionar este bloco logo abaixo da secção "Engenharia e Arquitetura" para impressionar de vez. Ele desenha o fluxo dos teus Use Cases:
+
+```markdown
+### 📐 Fluxo de Autenticação (Exemplo)
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant LoginUseCase
+    participant Repository
+    
+    Client->>Controller: POST /auth/login
+    Controller->>LoginUseCase: execute(credentials)
+    LoginUseCase->>Repository: findByEmail(email)
+    Repository-->>LoginUseCase: UserDetails
+    LoginUseCase->>LoginUseCase: validatePassword()
+    LoginUseCase-->>Controller: JWT Token
+    Controller-->>Client: 200 OK (Token)
