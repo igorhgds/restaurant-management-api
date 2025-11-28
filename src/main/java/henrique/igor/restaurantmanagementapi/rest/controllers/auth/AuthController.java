@@ -1,10 +1,8 @@
 package henrique.igor.restaurantmanagementapi.rest.controllers.auth;
 
-import henrique.igor.restaurantmanagementapi.entities.dtos.auth.request.ActivateAccountRequestDTO;
-import henrique.igor.restaurantmanagementapi.entities.dtos.auth.request.LoginRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.auth.request.*;
 import henrique.igor.restaurantmanagementapi.entities.dtos.auth.response.LoginResponseDTO;
-import henrique.igor.restaurantmanagementapi.usecases.auth.ActivateAccountUseCase;
-import henrique.igor.restaurantmanagementapi.usecases.auth.LoginUseCase;
+import henrique.igor.restaurantmanagementapi.usecases.auth.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,17 +14,29 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final GeneratePasswordRecoveryCodeUseCase generatePasswordRecoveryCodeUseCase;
     private final ActivateAccountUseCase activateAccountUseCase;
+    private final ChangePasswordUseCase changePasswordUseCase;
     private final LoginUseCase loginUseCase;
 
     @PatchMapping("/activate")
     public void activateAccount(@RequestBody @Valid ActivateAccountRequestDTO request) {
-        activateAccountUseCase.activateAccount(request);
+        activateAccountUseCase.execute(request);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request) {
-        LoginResponseDTO response = loginUseCase.login(request);
+        LoginResponseDTO response = loginUseCase.execute(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/generate-password-recovery-code")
+    public void requirePasswordRecovery(@RequestBody @Valid GeneratePasswordRecoveryRequestDTO request){
+        generatePasswordRecoveryCodeUseCase.execute(request);
+    }
+
+    @PatchMapping("/change-password")
+    public void changePassword(@RequestBody @Valid ChangePasswordRequestDTO request){
+        changePasswordUseCase.execute(request);
     }
 }

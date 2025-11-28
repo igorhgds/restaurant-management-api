@@ -78,7 +78,7 @@ public class CreateUserUseCaseTest {
                 fakeCreatedAt);
         when(userMapper.toUserResponseDTO(mappedUser)).thenReturn(responseDTO);
 
-        UserResponseDTO result = createUserUseCase.createUser(request);
+        UserResponseDTO result = createUserUseCase.execute(request);
 
         assertEquals("igor", result.username());
         assertEquals("igor@email.com", result.email());
@@ -93,7 +93,7 @@ public class CreateUserUseCaseTest {
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> createUserUseCase.createUser(request)
+                () -> createUserUseCase.execute(request)
         );
         assertTrue(exception.getDetails().toString().contains("username"));
     }
@@ -105,7 +105,7 @@ public class CreateUserUseCaseTest {
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> createUserUseCase.createUser(request)
+                () -> createUserUseCase.execute(request)
         );
         assertTrue(exception.getDetails().toString().contains("email"));
     }
@@ -120,7 +120,7 @@ public class CreateUserUseCaseTest {
         CreateUserRequestDTO adminRequest = new CreateUserRequestDTO("adminUser", "admin@example.com", UserRole.ADMIN);
 
         BusinessRuleException ex = assertThrows(BusinessRuleException.class,
-                () -> createUserUseCase.createUser(adminRequest));
+                () -> createUserUseCase.execute(adminRequest));
 
         assertEquals(ExceptionCode.UNAUTHORIZED, ex.getCode());
     }
@@ -153,7 +153,7 @@ public class CreateUserUseCaseTest {
                 fakeCreatedAt);
         when(userMapper.toUserResponseDTO(mappedUser)).thenReturn(responseDTO);
 
-        UserResponseDTO result = createUserUseCase.createUser(request);
+        UserResponseDTO result = createUserUseCase.execute(request);
 
         assertEquals("igor", result.username());
         verify(emailService).sendActivationEmail("igor@email.com", "XYZ789");

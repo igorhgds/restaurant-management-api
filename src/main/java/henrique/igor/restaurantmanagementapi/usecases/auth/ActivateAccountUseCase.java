@@ -16,7 +16,7 @@ public class ActivateAccountUseCase {
     private final UserJpaRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public void activateAccount(ActivateAccountRequestDTO request){
+    public void execute(ActivateAccountRequestDTO request){
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessRuleException(ExceptionCode.ENTITY_NOT_FOUND));
 

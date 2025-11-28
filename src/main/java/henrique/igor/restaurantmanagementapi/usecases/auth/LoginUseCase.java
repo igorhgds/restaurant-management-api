@@ -17,7 +17,7 @@ public class LoginUseCase {
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
 
-    public LoginResponseDTO login(LoginRequestDTO request){
+    public LoginResponseDTO execute(LoginRequestDTO request){
         var usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var userDetails = (UserDetailsDTO) auth.getPrincipal();

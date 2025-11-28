@@ -8,12 +8,9 @@ import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.mapper.user.UserStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
-import henrique.igor.restaurantmanagementapi.security.dto.UserDetailsDTO;
 import henrique.igor.restaurantmanagementapi.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -30,7 +27,7 @@ public class CreateUserUseCase {
     private final AuthenticationContextService authService;
 
     @Transactional
-    public UserResponseDTO createUser(CreateUserRequestDTO request) {
+    public UserResponseDTO execute(CreateUserRequestDTO request) {
         var loggedUser = authService.getAutheticatedUser();
 
         this.validateRoleHierarchy(loggedUser.getUserRole(), request.userRole());
