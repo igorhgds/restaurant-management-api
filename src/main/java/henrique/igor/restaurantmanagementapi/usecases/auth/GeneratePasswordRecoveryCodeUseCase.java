@@ -8,10 +8,14 @@ import henrique.igor.restaurantmanagementapi.services.EmailService;
 import henrique.igor.restaurantmanagementapi.services.RandomCodeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GeneratePasswordRecoveryCodeUseCase {
 
     private final UserJpaRepository userRepository;
@@ -20,13 +24,18 @@ public class GeneratePasswordRecoveryCodeUseCase {
 
     @Transactional
     public void execute(GeneratePasswordRecoveryRequestDTO request){
-        var user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new EntityNotFoundException(User.class));
+        Optional<User> user = userRepository.findByEmail(request.email());
 
+        if (user.isEmpty()) {
+            log.warn("Attempt to recover password for a non-existent email address.: {}", request.email());
+            return;
+        }
+
+        var userValid = user.get();
         var temporaryCode = randomCodeService.generate(6);
 
-        this.updateUser(user, temporaryCode);
-        this.sendEmail(user, temporaryCode);
+        this.updateUser(userValid, temporaryCode);
+        this.sendEmail(userValid, temporaryCode);
     }
 
     private void updateUser(User user, String temporaryCode){

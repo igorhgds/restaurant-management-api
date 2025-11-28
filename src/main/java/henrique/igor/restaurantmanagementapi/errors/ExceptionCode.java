@@ -3,11 +3,10 @@ package henrique.igor.restaurantmanagementapi.errors;
 public enum ExceptionCode {
     ENTITY_NOT_FOUND,
     DUPLICATED_RESOURCE,
-    USERNAME_ALREADY_EXISTS,
-    INVALID_ACTIVATION_CODE,
     INTERNAL_SERVER_ERROR,
     UNAUTHORIZED,
-    BAD_CREDENTIALS;
+    BAD_CREDENTIALS,
+    INVALID_CREDENTIALS;
 
 
     public String getExceptionIndex(){

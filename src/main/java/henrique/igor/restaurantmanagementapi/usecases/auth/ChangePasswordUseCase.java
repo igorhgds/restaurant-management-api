@@ -20,18 +20,21 @@ public class ChangePasswordUseCase {
 
     @Transactional
     public void execute(ChangePasswordRequestDTO request){
-        var user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new EntityNotFoundException(UserJpaRepository.class));
+        var user = userRepository.findByEmail(request.email());
 
-        this.validateRecoveryCode(user, request);
+        if (user.isEmpty() || !this.isCodeValid(user.get(), request)){
+            throw new BusinessRuleException(ExceptionCode.INVALID_CREDENTIALS);
+        }
 
-        user.setPassword(bCryptPasswordEncoder.encode(request.password()));
-        user.setPasswordRecoveryCode(null);
-        userRepository.save(user);
+        var userValid = user.get();
+
+        userValid.setPassword(bCryptPasswordEncoder.encode(request.password()));
+        userValid.setPasswordRecoveryCode(null);
+        userRepository.save(userValid);
     }
 
-    private void validateRecoveryCode(User user, ChangePasswordRequestDTO request){
-        if(!user.getPasswordRecoveryCode().equals(request.passwordRecoveryCode()))
-            throw new BusinessRuleException(ExceptionCode.INVALID_ACTIVATION_CODE);
+    private boolean isCodeValid(User user, ChangePasswordRequestDTO request){
+        return user.getPasswordRecoveryCode() != null &&
+                user.getPasswordRecoveryCode().equals(request.passwordRecoveryCode());
     }
 }

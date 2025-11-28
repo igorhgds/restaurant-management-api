@@ -7,13 +7,13 @@ import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.UnauthorizedException;
 import henrique.igor.restaurantmanagementapi.security.dto.UserDetailsDTO;
 import henrique.igor.restaurantmanagementapi.security.service.JwtTokenService;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginUseCaseTest {
+class LoginUseCaseTest {
 
     @Mock
     private JwtTokenService jwtTokenService;
@@ -71,7 +71,7 @@ public class LoginUseCaseTest {
             loginUseCase.execute(request);
         });
 
-        assertEquals(ExceptionCode.BAD_CREDENTIALS, exception.getCode());
+        assertEquals(ExceptionCode.UNAUTHORIZED, exception.getCode());
         verify(jwtTokenService, never()).generateToken(any());
     }
 

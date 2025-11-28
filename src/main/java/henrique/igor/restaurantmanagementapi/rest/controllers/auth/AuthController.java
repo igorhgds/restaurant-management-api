@@ -2,6 +2,7 @@ package henrique.igor.restaurantmanagementapi.rest.controllers.auth;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.auth.request.*;
 import henrique.igor.restaurantmanagementapi.entities.dtos.auth.response.LoginResponseDTO;
+import henrique.igor.restaurantmanagementapi.rest.specs.AuthControllerSpecs;
 import henrique.igor.restaurantmanagementapi.usecases.auth.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerSpecs {
 
     private final GeneratePasswordRecoveryCodeUseCase generatePasswordRecoveryCodeUseCase;
     private final ActivateAccountUseCase activateAccountUseCase;
@@ -31,7 +32,7 @@ public class AuthController {
     }
 
     @PatchMapping("/generate-password-recovery-code")
-    public void requirePasswordRecovery(@RequestBody @Valid GeneratePasswordRecoveryRequestDTO request){
+    public void generatePasswordRecovery(@RequestBody @Valid GeneratePasswordRecoveryRequestDTO request){
         generatePasswordRecoveryCodeUseCase.execute(request);
     }
 

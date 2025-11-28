@@ -23,7 +23,7 @@ public class LoginUseCase {
         var userDetails = (UserDetailsDTO) auth.getPrincipal();
 
         if (!userDetails.getUser().isEnabled())
-            throw new UnauthorizedException(ExceptionCode.BAD_CREDENTIALS);
+            throw new UnauthorizedException(ExceptionCode.UNAUTHORIZED);
 
         var token = jwtTokenService.generateToken(userDetails);
         return new LoginResponseDTO(token);

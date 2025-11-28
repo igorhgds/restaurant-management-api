@@ -14,3 +14,6 @@ custom:
     secret: ${JWT_SECRET:changeMeToAStrongSecret}
     expiration: ${JWT_EXPIRATION:3600} # 60 minutos
     issuer: ${JWT_ISSUER:Restaurant Project API}
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html

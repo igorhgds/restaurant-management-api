@@ -1,6 +1,7 @@
 package henrique.igor.restaurantmanagementapi.errors;
 
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
+import henrique.igor.restaurantmanagementapi.errors.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -90,6 +91,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.error("Authentication Error: {}", exception.getMessage(), exception);
         return handleExceptionInternal(exception, body, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler(value = { EntityNotFoundException.class })
+    public ResponseEntity<Object> entityNotFoundExceptionHandler(EntityNotFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        ErrorResponse body = buildErrorResponse(
+                status,
+                ExceptionCode.ENTITY_NOT_FOUND,
+                exception.getMessage()
+        );
+
+        log.error(exception.getMessage(), exception);
+        return handleExceptionInternal(exception, body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 }
 

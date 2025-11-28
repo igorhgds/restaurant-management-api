@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ActivateAccountUseCase {
@@ -17,17 +19,21 @@ public class ActivateAccountUseCase {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public void execute(ActivateAccountRequestDTO request){
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BusinessRuleException(ExceptionCode.ENTITY_NOT_FOUND));
+        Optional<User> user = userRepository.findByEmail(request.email());
 
-        if (!request.passwordRecoveryCode().equals(user.getPasswordRecoveryCode())){
-            throw new BusinessRuleException(ExceptionCode.INVALID_ACTIVATION_CODE);
+        if (user.isEmpty() || !this.isCodeValid(user.get(), request)){
+            throw new BusinessRuleException(ExceptionCode.INVALID_CREDENTIALS);
         }
 
-        user.setPasswordRecoveryCode(null);
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setEnabled(true);
+        var userValid = user.get();
+        userValid.setPassword(passwordEncoder.encode(request.password()));
+        userValid.setEnabled(true);
+        userValid.setPasswordRecoveryCode(null);
+        userRepository.save(userValid);
+    }
 
-        userRepository.save(user);
+    private boolean isCodeValid(User user, ActivateAccountRequestDTO request) {
+        return user.getPasswordRecoveryCode() != null &&
+                user.getPasswordRecoveryCode().equals(request.passwordRecoveryCode());
     }
 }
