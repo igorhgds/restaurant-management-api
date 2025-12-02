@@ -49,9 +49,9 @@ public class CreateUserUseCase {
         return userMapper.toUserResponseDTO(userRepository.save(user));
     }
 
-    private void validateRoleHierarchy(UserRole currentRole, UserRole requestedRole){
-        if (currentRole.equals(UserRole.ADMIN)) return;
-        if (currentRole.equals(UserRole.MANAGER) && !requestedRole.equals(UserRole.ADMIN)) return;
-        throw new BusinessRuleException(ExceptionCode.UNAUTHORIZED);
+    private void validateRoleHierarchy(UserRole loggedUserRole, UserRole targetUserRole){
+        if (loggedUserRole.equals(UserRole.ADMIN)) return;
+        if (loggedUserRole.equals(UserRole.MANAGER) && !targetUserRole.equals(UserRole.ADMIN)) return;
+        throw new BusinessRuleException(ExceptionCode.FORBIDDEN);
     }
 }

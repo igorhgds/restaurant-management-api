@@ -6,7 +6,8 @@ public enum ExceptionCode {
     INTERNAL_SERVER_ERROR,
     UNAUTHORIZED,
     BAD_CREDENTIALS,
-    INVALID_CREDENTIALS;
+    INVALID_CREDENTIALS,
+    FORBIDDEN;
 
 
     public String getExceptionIndex(){

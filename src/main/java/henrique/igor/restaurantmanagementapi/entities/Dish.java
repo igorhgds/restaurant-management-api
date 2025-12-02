@@ -22,7 +22,7 @@ public class Dish {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID dishId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
