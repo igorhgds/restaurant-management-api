@@ -3,6 +3,7 @@ package henrique.igor.restaurantmanagementapi.rest.controllers.user;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.CreateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.UserResponseDTO;
+import henrique.igor.restaurantmanagementapi.rest.specs.UserControllerSpecs;
 import henrique.igor.restaurantmanagementapi.usecases.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerSpecs {
 
     private final CreateUserUseCase createUserUseCase;
     private final DeleteUserByIdUseCase deleteUserByIdUseCase;
