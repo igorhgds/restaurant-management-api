@@ -6,23 +6,24 @@ import lombok.Getter;
 @Getter
 public class UnauthorizedException extends RuntimeException {
     private ExceptionCode code;
-    private final Exception originalException;
 
     public UnauthorizedException() {
-        super(ExceptionCode.UNAUTHORIZED.toString());
+        super(ExceptionCode.UNAUTHORIZED.name());
         this.code = ExceptionCode.UNAUTHORIZED;
-        this.originalException = null;
     }
 
-    public UnauthorizedException(Exception exception) {
-        super(ExceptionCode.UNAUTHORIZED.toString());
+    public UnauthorizedException(Throwable cause) {
+        super(ExceptionCode.UNAUTHORIZED.name(), cause);
         this.code = ExceptionCode.UNAUTHORIZED;
-        this.originalException = exception;
     }
 
     public UnauthorizedException(ExceptionCode code) {
-        super(code.toString());
+        super(code.name());
         this.code = code;
-        this.originalException = null;
+    }
+
+    public UnauthorizedException(ExceptionCode code, Throwable cause) {
+        super(code.name(), cause);
+        this.code = code;
     }
 }
