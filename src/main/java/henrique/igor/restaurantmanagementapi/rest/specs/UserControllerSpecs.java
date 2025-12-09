@@ -23,7 +23,7 @@ import java.util.UUID;
 public interface UserControllerSpecs {
 
     @Operation(summary = "Create user")
-    @ApiResponse(responseCode = "200", description = "User created successfully.",
+    @ApiResponse(responseCode = "201", description = "User created successfully.",
             content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
     @ApiResponseBusinessRuleException
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request);

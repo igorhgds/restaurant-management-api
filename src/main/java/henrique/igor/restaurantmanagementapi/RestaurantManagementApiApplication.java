@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableWebSecurity
 public class RestaurantManagementApiApplication {
 
     public static void main(String[] args) {
