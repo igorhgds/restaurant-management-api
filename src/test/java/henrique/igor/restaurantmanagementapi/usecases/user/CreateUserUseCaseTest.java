@@ -122,11 +122,13 @@ public class CreateUserUseCaseTest {
         BusinessRuleException ex = assertThrows(BusinessRuleException.class,
                 () -> createUserUseCase.execute(adminRequest));
 
-        assertEquals(ExceptionCode.UNAUTHORIZED, ex.getCode());
+        assertEquals(ExceptionCode.FORBIDDEN, ex.getCode());
     }
 
     @Test
-    void shouldAllowManagerToCreateUserRole() {
+    void shouldAllowManagerToCreateWaiter() {
+        CreateUserRequestDTO request = new CreateUserRequestDTO(
+                "igor", "igor@email.com", UserRole.WAITER);
         User manager = new User();
         manager.setUserRole(UserRole.MANAGER);
 
@@ -149,7 +151,7 @@ public class CreateUserUseCaseTest {
                 fakeId,
                 "igor",
                 "igor@email.com",
-                UserRole.MANAGER,
+                UserRole.WAITER,
                 fakeCreatedAt);
         when(userMapper.toUserResponseDTO(mappedUser)).thenReturn(responseDTO);
 
