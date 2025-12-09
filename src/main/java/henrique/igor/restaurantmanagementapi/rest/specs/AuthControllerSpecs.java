@@ -22,24 +22,24 @@ public interface AuthControllerSpecs {
             content = @Content(schema = @Schema(implementation = LoginResponseDTO.class)))
     @ApiResponseBadRequest
     @ApiResponseUnauthorized
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request);
+    ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request);
 
     @Operation(summary = "Activate user account")
     @ApiResponse(responseCode = "204", description = "Account successfully activated.")
     @ApiResponseBadRequest
     @ApiResponseBusinessRuleException
-    public void activateAccount(@RequestBody @Valid ActivateAccountRequestDTO request);
+    void activateAccount(@RequestBody @Valid ActivateAccountRequestDTO request);
 
     @Operation(summary = "Generate password recovery code")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void generatePasswordRecovery(@RequestBody @Valid GeneratePasswordRecoveryRequestDTO request);
+    void generatePasswordRecovery(@RequestBody @Valid GeneratePasswordRecoveryRequestDTO request);
 
     @Operation(summary = "Change password")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
     @ApiResponseBusinessRuleException
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@RequestBody @Valid ChangePasswordRequestDTO request);
+    void changePassword(@RequestBody @Valid ChangePasswordRequestDTO request);
 }
