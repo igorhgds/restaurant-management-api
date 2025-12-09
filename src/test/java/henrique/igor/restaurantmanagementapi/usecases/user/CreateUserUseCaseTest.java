@@ -9,6 +9,7 @@ import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleExcep
 import henrique.igor.restaurantmanagementapi.mapper.user.UserStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
 import henrique.igor.restaurantmanagementapi.services.*;
+import henrique.igor.restaurantmanagementapi.util.ValidateRoleHierarchy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateUserUseCaseTest {
@@ -37,6 +37,8 @@ public class CreateUserUseCaseTest {
     private EmailService emailService;
     @Mock
     private AuthenticationContextService authService;
+    @Mock
+    private ValidateRoleHierarchy validateRoleHierarchy;
 
     @InjectMocks
     private CreateUserUseCase createUserUseCase;
@@ -58,6 +60,7 @@ public class CreateUserUseCaseTest {
         when(userRepository.findByUsername("igor")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.empty());
         when(randomCodeService.generate(6)).thenReturn("123456");
+        doNothing().when(validateRoleHierarchy).execute(any(), any());
 
         User mappedUser = new User();
         mappedUser.setUsername(request.username());
@@ -90,6 +93,7 @@ public class CreateUserUseCaseTest {
     void shouldThrowExceptionWhenUsernameDuplicated() {
         when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
         when(userRepository.findByUsername("igor")).thenReturn(Optional.of(new User()));
+        doNothing().when(validateRoleHierarchy).execute(any(), any());
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
@@ -102,6 +106,7 @@ public class CreateUserUseCaseTest {
     void shouldThrowExceptionWhenEmailDuplicated() {
         when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
         when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.of(new User()));
+        doNothing().when(validateRoleHierarchy).execute(any(), any());
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
@@ -119,6 +124,10 @@ public class CreateUserUseCaseTest {
 
         CreateUserRequestDTO adminRequest = new CreateUserRequestDTO("adminUser", "admin@example.com", UserRole.ADMIN);
 
+        doThrow(new BusinessRuleException(ExceptionCode.FORBIDDEN))
+                .when(validateRoleHierarchy)
+                .execute(UserRole.MANAGER, UserRole.ADMIN);
+
         BusinessRuleException ex = assertThrows(BusinessRuleException.class,
                 () -> createUserUseCase.execute(adminRequest));
 
@@ -133,6 +142,7 @@ public class CreateUserUseCaseTest {
         manager.setUserRole(UserRole.MANAGER);
 
         when(authService.getAutheticatedUser()).thenReturn(manager);
+        doNothing().when(validateRoleHierarchy).execute(any(), any());
         when(userRepository.findByUsername("igor")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.empty());
         when(randomCodeService.generate(6)).thenReturn("XYZ789");
@@ -159,5 +169,7 @@ public class CreateUserUseCaseTest {
 
         assertEquals("igor", result.username());
         verify(emailService).sendActivationEmail("igor@email.com", "XYZ789");
+        verify(validateRoleHierarchy).execute(UserRole.MANAGER, UserRole.WAITER);
+
     }
 }
