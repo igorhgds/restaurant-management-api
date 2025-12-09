@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name= "User", description = "Users operations")
@@ -34,5 +35,12 @@ public interface UserControllerSpecs {
     @Operation(summary = "Find user by id")
     @ApiResponse(responseCode = "200", description = "User created successfully.",
             content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
+    @ApiResponseBusinessRuleException
     public ResponseEntity<MinimalUserResponseDTO> findUserById(@PathVariable UUID userId);
+
+    @Operation(summary = "list all users")
+    @ApiResponse(responseCode = "200", description = "Users list successfully.",
+            content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
+    @ApiResponseBadRequest
+    public ResponseEntity<List<MinimalUserResponseDTO>> listUsers();
 }

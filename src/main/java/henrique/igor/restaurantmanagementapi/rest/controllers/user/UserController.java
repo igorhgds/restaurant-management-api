@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,6 +22,7 @@ public class UserController implements UserControllerSpecs {
     private final CreateUserUseCase createUserUseCase;
     private final DeleteUserByIdUseCase deleteUserByIdUseCase;
     private final FindUserByIdUseCase findUserByIdUseCase;
+    private final ListUsersUseCase listUsersUseCase;
 
     @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request){
@@ -36,6 +38,12 @@ public class UserController implements UserControllerSpecs {
     @GetMapping("/{userId}")
     public ResponseEntity<MinimalUserResponseDTO> findUserById(@PathVariable UUID userId){
         MinimalUserResponseDTO response = findUserByIdUseCase.execute(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/list-users")
+    public ResponseEntity<List<MinimalUserResponseDTO>> listUsers(){
+        List<MinimalUserResponseDTO> response = listUsersUseCase.execute();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
