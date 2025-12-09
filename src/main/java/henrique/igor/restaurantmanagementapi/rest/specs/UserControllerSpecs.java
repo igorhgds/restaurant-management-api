@@ -26,27 +26,27 @@ public interface UserControllerSpecs {
     @ApiResponse(responseCode = "201", description = "User created successfully.",
             content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
     @ApiResponseBusinessRuleException
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request);
+    ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request);
 
     @Operation(summary = "Delete user")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
-    public void delete(@PathVariable UUID userId);
+    void delete(@PathVariable UUID userId);
 
     @Operation(summary = "Find user by id")
     @ApiResponse(responseCode = "200", description = "User created successfully.",
             content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
     @ApiResponseBusinessRuleException
-    public ResponseEntity<MinimalUserResponseDTO> findUserById(@PathVariable UUID userId);
+    ResponseEntity<MinimalUserResponseDTO> findUserById(@PathVariable UUID userId);
 
     @Operation(summary = "list all users")
     @ApiResponse(responseCode = "200", description = "Users list successfully.",
             content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
     @ApiResponseBadRequest
-    public ResponseEntity<List<MinimalUserResponseDTO>> listUsers();
+    ResponseEntity<List<MinimalUserResponseDTO>> listUsers();
 
     @Operation(summary = "update user")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
-    public void updateUser(@RequestBody UpdateUserRequestDTO request);
+    void updateUser(@RequestBody UpdateUserRequestDTO request);
 }

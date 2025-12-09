@@ -19,8 +19,6 @@ import java.util.List;
 
 import static henrique.igor.restaurantmanagementapi.enums.UserRole.ADMIN;
 import static org.springframework.http.HttpMethod.*;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
 @EnableWebSecurity
