@@ -1,6 +1,7 @@
 package henrique.igor.restaurantmanagementapi.rest.controllers.user;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.CreateUserRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.UpdateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.UserResponseDTO;
 import henrique.igor.restaurantmanagementapi.rest.specs.UserControllerSpecs;
@@ -23,6 +24,7 @@ public class UserController implements UserControllerSpecs {
     private final DeleteUserByIdUseCase deleteUserByIdUseCase;
     private final FindUserByIdUseCase findUserByIdUseCase;
     private final ListUsersUseCase listUsersUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
 
     @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request){
@@ -45,5 +47,10 @@ public class UserController implements UserControllerSpecs {
     public ResponseEntity<List<MinimalUserResponseDTO>> listUsers(){
         List<MinimalUserResponseDTO> response = listUsersUseCase.execute();
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/update")
+    public void updateUser(@RequestBody UpdateUserRequestDTO request){
+        updateUserUseCase.execute(request);
     }
 }
