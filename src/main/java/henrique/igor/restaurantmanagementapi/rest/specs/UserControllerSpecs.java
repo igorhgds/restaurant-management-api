@@ -1,6 +1,7 @@
 package henrique.igor.restaurantmanagementapi.rest.specs;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.CreateUserRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.UpdateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.UserResponseDTO;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBadRequest;
@@ -43,4 +44,9 @@ public interface UserControllerSpecs {
             content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
     @ApiResponseBadRequest
     public ResponseEntity<List<MinimalUserResponseDTO>> listUsers();
+
+    @Operation(summary = "update user")
+    @ApiResponse(responseCode = "204", description = "ok")
+    @ApiResponseBadRequest
+    public void updateUser(@RequestBody UpdateUserRequestDTO request);
 }
