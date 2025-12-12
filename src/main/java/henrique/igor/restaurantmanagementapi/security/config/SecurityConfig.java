@@ -64,9 +64,7 @@ public class SecurityConfig {
 
     private static final RouteDTO ADMIN_ROUTES = new RouteDTO()
             .setRoles(ADMIN)
-            .setPaths(GET, List.of(
-
-            ));
+            .setPaths(GET, List.of());
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
