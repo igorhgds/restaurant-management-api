@@ -13,9 +13,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 public class CreateUserUseCase {
@@ -33,13 +30,9 @@ public class CreateUserUseCase {
 
         validateRoleHierarchy.execute(loggedUser.getUserRole(), request.userRole());
 
-        Map<String, String> errors = new HashMap<>();
-        if(userRepository.findByUsername(request.username()).isPresent())
-            errors.put("username", "user.username.duplicate");
-        if(userRepository.findByEmail(request.email()).isPresent())
-            errors.put("email", "user.email.duplicate");
-        if (!errors.isEmpty())
-            throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, errors);
+        if (userRepository.existsByUsernameOrEmail(request.username(), request.email())) {
+            throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, "user.username.or.email.duplicate");
+        }
 
         var temporaryCode = randomCodeService.generate(6);
         User user = userMapper.toEntity(request);

@@ -1,4 +1,4 @@
-package henrique.igor.restaurantmanagementapi.rest.controllers.auth;
+package henrique.igor.restaurantmanagementapi.rest.controllers;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.auth.request.*;
 import henrique.igor.restaurantmanagementapi.entities.dtos.auth.response.LoginResponseDTO;

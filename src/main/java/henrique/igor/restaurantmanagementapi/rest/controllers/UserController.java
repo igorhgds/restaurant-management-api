@@ -1,4 +1,4 @@
-package henrique.igor.restaurantmanagementapi.rest.controllers.user;
+package henrique.igor.restaurantmanagementapi.rest.controllers;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.CreateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.UpdateUserRequestDTO;

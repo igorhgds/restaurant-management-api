@@ -57,8 +57,7 @@ public class CreateUserUseCaseTest {
     @Test
     void shouldCreateUserSuccessfully() {
         when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
-        when(userRepository.findByUsername("igor")).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.empty());
+        when(userRepository.existsByUsernameOrEmail("igor", "igor@email.com")).thenReturn(false);
         when(randomCodeService.generate(6)).thenReturn("123456");
         doNothing().when(validateRoleHierarchy).execute(any(), any());
 
@@ -90,29 +89,17 @@ public class CreateUserUseCaseTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUsernameDuplicated() {
+    void shouldThrowExceptionWhenUsernameOrEmailDuplicated() {
         when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
-        when(userRepository.findByUsername("igor")).thenReturn(Optional.of(new User()));
+        when(userRepository.existsByUsernameOrEmail("igor", "igor@email.com")).thenReturn(true);
         doNothing().when(validateRoleHierarchy).execute(any(), any());
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> createUserUseCase.execute(request)
         );
-        assertTrue(exception.getDetails().toString().contains("username"));
-    }
 
-    @Test
-    void shouldThrowExceptionWhenEmailDuplicated() {
-        when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
-        when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.of(new User()));
-        doNothing().when(validateRoleHierarchy).execute(any(), any());
-
-        BusinessRuleException exception = assertThrows(
-                BusinessRuleException.class,
-                () -> createUserUseCase.execute(request)
-        );
-        assertTrue(exception.getDetails().toString().contains("email"));
+        assertEquals("user.username.or.email.duplicate", exception.getDetails());
     }
 
     @Test
@@ -143,8 +130,7 @@ public class CreateUserUseCaseTest {
 
         when(authService.getAutheticatedUser()).thenReturn(manager);
         doNothing().when(validateRoleHierarchy).execute(any(), any());
-        when(userRepository.findByUsername("igor")).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("igor@email.com")).thenReturn(Optional.empty());
+        when(userRepository.existsByUsernameOrEmail("igor", "igor@email.com")).thenReturn(false);
         when(randomCodeService.generate(6)).thenReturn("XYZ789");
 
         User mappedUser = new User();

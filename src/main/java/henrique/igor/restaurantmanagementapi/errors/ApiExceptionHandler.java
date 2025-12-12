@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -31,33 +28,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             message = "Unidentified error: " + exceptionCode.name();
         }
 
-        Object finalDetails = details;
-
-        if (details instanceof Map)
-            finalDetails = translateErrorDetails((Map<String, String>) details);
-
         String formattedCode = String.valueOf(status.value());
 
         return new ErrorResponse()
                 .withCode(formattedCode)
                 .withReason(message)
-                .withDetails(finalDetails);
+                .withDetails(details);
     }
 
-    private Map<String, String> translateErrorDetails(Map<String, String> originalMap) {
-        Map<String, String> translatedMap = new HashMap<>();
-
-        originalMap.forEach((field, key) -> {
-            try {
-                String translatedMessage = messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
-                translatedMap.put(field, translatedMessage);
-            } catch (Exception e) {
-                translatedMap.put(field, key);
-            }
-        });
-
-        return translatedMap;
-    }
 
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<Object> handlerBusinessRuleException(BusinessRuleException exception, WebRequest request) {

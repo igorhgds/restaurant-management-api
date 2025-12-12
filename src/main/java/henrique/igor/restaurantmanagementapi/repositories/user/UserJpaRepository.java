@@ -2,6 +2,8 @@ package henrique.igor.restaurantmanagementapi.repositories.user;
 
 import henrique.igor.restaurantmanagementapi.entities.User;
 import henrique.igor.restaurantmanagementapi.enums.UserRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +18,6 @@ public interface UserJpaRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUserId(UUID userId);
 
     List<User> findByUserRoleIn(List<UserRole> roles);
+
+    boolean existsByUsernameOrEmail(@NotBlank String username, @NotBlank @Email String email);
 }
