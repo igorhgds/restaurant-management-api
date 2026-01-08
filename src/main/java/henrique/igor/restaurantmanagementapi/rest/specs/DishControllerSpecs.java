@@ -2,6 +2,7 @@ package henrique.igor.restaurantmanagementapi.rest.specs;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.CreateDishRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
+import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBadRequest;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBusinessRuleException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.UUID;
 
 @Tag(name= "Dish", description = "Dishes operations")
 public interface DishControllerSpecs {
@@ -20,4 +24,9 @@ public interface DishControllerSpecs {
             content = @Content(schema = @Schema(implementation = DishResponseDTO.class)))
     @ApiResponseBusinessRuleException
     ResponseEntity<DishResponseDTO> createDish(@RequestBody @Valid CreateDishRequestDTO request);
+
+    @Operation(summary = "Delete dish")
+    @ApiResponse(responseCode = "204", description = "ok")
+    @ApiResponseBadRequest
+    public void delete(@PathVariable UUID dishId);
 }

@@ -55,7 +55,8 @@ public class SecurityConfig {
                     "/users/list-users"
             ))
             .setPaths(POST, List.of(
-                    "/users/create"
+                    "/users/create",
+                    "/dishes/create"
             ))
             .setPaths(PATCH, List.of(
                     "/users/update"
