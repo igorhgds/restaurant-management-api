@@ -23,6 +23,7 @@ public class CreateDishUseCase {
         Dish dish = new Dish();
         dish.setName(request.name());
         dish.setPrice(request.price());
+        dish.setCategory(request.category());
         dish.setDescription(request.description());
 
         Dish saved = dishRepository.save(dish);

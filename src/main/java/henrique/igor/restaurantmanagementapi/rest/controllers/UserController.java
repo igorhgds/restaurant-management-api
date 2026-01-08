@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,12 +28,14 @@ public class UserController implements UserControllerSpecs {
     private final UpdateUserUseCase updateUserUseCase;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request){
         UserResponseDTO response = createUserUseCase.execute(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/delete/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void delete(@PathVariable UUID userId){
         deleteUserByIdUseCase.execute(userId);
     }
@@ -50,6 +53,7 @@ public class UserController implements UserControllerSpecs {
     }
 
     @PatchMapping("/update")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void updateUser(@RequestBody UpdateUserRequestDTO request){
         updateUserUseCase.execute(request);
     }

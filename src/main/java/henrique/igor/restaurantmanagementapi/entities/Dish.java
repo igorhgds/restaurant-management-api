@@ -1,5 +1,6 @@
 package henrique.igor.restaurantmanagementapi.entities;
 
+import henrique.igor.restaurantmanagementapi.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,10 @@ public class Dish {
 
     @Column(nullable = false)
     private BigDecimal price;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private String description;
 
