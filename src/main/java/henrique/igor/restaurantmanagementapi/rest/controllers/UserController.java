@@ -34,12 +34,6 @@ public class UserController implements UserControllerSpecs {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping("/delete/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public void delete(@PathVariable UUID userId){
-        deleteUserByIdUseCase.execute(userId);
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<MinimalUserResponseDTO> findUserById(@PathVariable UUID userId){
         MinimalUserResponseDTO response = findUserByIdUseCase.execute(userId);
@@ -56,5 +50,11 @@ public class UserController implements UserControllerSpecs {
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void updateUser(@RequestBody UpdateUserRequestDTO request){
         updateUserUseCase.execute(request);
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public void delete(@PathVariable UUID userId){
+        deleteUserByIdUseCase.execute(userId);
     }
 }

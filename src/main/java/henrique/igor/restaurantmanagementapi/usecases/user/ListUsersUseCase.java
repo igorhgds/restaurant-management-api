@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,6 @@ public class ListUsersUseCase {
 
         return users.stream()
                 .map(userMapper::toMinimalUserResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

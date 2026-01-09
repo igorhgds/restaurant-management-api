@@ -52,7 +52,9 @@ public class SecurityConfig {
     private static final RouteDTO PRIVATE_ROUTES = new RouteDTO()
             .setPaths(GET, List.of(
                     "/users/{userId}",
-                    "/users/list-users"
+                    "/users/list-users",
+                    "/dishes/{dishId}",
+                    "/dishes/list"
             ))
             .setPaths(POST, List.of(
                     "/users/create",
