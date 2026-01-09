@@ -2,6 +2,7 @@ package henrique.igor.restaurantmanagementapi.rest.specs;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.CreateDishRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBadRequest;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBusinessRuleException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name= "Dish", description = "Dishes operations")
@@ -25,8 +27,20 @@ public interface DishControllerSpecs {
     @ApiResponseBusinessRuleException
     ResponseEntity<DishResponseDTO> createDish(@RequestBody @Valid CreateDishRequestDTO request);
 
+    @Operation(summary = "Find dish by id")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = DishResponseDTO.class)))
+    @ApiResponseBadRequest
+    ResponseEntity<DishResponseDTO> findDish(@PathVariable UUID dishId);
+
+    @Operation(summary = "List all dishes")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = DishResponseDTO.class)))
+    @ApiResponseBadRequest
+    ResponseEntity<List<DishResponseDTO>> listDishes();
+
     @Operation(summary = "Delete dish")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
-    public void delete(@PathVariable UUID dishId);
+    void delete(@PathVariable UUID dishId);
 }
