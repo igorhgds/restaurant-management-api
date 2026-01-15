@@ -34,7 +34,7 @@ A estrutura do projeto segue princípios de **S.O.L.I.D** e **Clean Architecture
 - [x] Testes Unitários dos Use Cases (Login, CreateUser)
 
 ### 🚧 Módulo de Restaurante (Em Desenvolvimento)
-- [ ] CRUD de Pratos e Categorias
+- [x] CRUD de Pratos e Categorias
 - [ ] Gestão de Mesas
 - [ ] Fluxo de Pedidos e Status
 
