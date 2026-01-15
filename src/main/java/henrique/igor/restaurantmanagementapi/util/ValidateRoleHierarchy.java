@@ -10,19 +10,17 @@ import java.util.*;
 @Component
 public class ValidateRoleHierarchy {
 
-    public void execute(UserRole loggedUserRole, UserRole targetUserRole){
-        if (loggedUserRole.equals(UserRole.ADMIN)) return;
-        if (loggedUserRole.equals(UserRole.MANAGER) && targetUserRole.equals(UserRole.WAITER)) return;
-        throw new BusinessRuleException(ExceptionCode.FORBIDDEN);
+    public void execute(UserRole loggedUserRole, UserRole targetUserRole) {
+        if (loggedUserRole == UserRole.ADMIN) return;
+
+        if (loggedUserRole.getLevel() <= targetUserRole.getLevel()) {
+            throw new BusinessRuleException(ExceptionCode.FORBIDDEN);
+        }
     }
 
     public List<UserRole> getVisibleRoles(UserRole loggedUserRole) {
-        if (loggedUserRole.equals(UserRole.ADMIN)) {
-            return Arrays.asList(UserRole.values());
-        } else if (loggedUserRole.equals(UserRole.MANAGER)) {
-            return Collections.singletonList(UserRole.WAITER);
-        } else {
-            return Collections.emptyList();
-        }
+        return Arrays.stream(UserRole.values())
+                .filter(role -> role.getLevel() < loggedUserRole.getLevel())
+                .toList();
     }
 }

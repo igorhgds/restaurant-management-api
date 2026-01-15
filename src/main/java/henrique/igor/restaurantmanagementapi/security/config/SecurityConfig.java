@@ -51,20 +51,22 @@ public class SecurityConfig {
 
     private static final RouteDTO PRIVATE_ROUTES = new RouteDTO()
             .setPaths(GET, List.of(
+                    "/users",
                     "/users/{userId}",
-                    "/users/list-users",
-                    "/dishes/{dishId}",
-                    "/dishes/list"
+                    "/dishes",
+                    "/dishes/{dishId}"
             ))
             .setPaths(POST, List.of(
-                    "/users/create",
-                    "/dishes/create"
+                    "/users",
+                    "/dishes"
             ))
             .setPaths(PATCH, List.of(
-                    "/users/update"
+                    "/users",
+                    "/users/{userId}",
+                    "/dishes"
             ))
             .setPaths(DELETE, List.of(
-                    "/users/delete/{userId}"
+                    "/users/{userId}"
             ));
 
     private static final RouteDTO ADMIN_ROUTES = new RouteDTO()

@@ -21,13 +21,18 @@ public class FindUserByIdUseCase {
     private final AuthenticationContextService authService;
     private final ValidateRoleHierarchy validateRoleHierarchy;
 
-    public MinimalUserResponseDTO execute(UUID userId){
+    public MinimalUserResponseDTO execute(UUID userId) {
         User loggedUser = authService.getAutheticatedUser();
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class));
 
-        validateRoleHierarchy.execute(loggedUser.getUserRole(), user.getUserRole());
+        if (!loggedUser.getUserId().equals(user.getUserId())) {
+            validateRoleHierarchy.execute(
+                    loggedUser.getUserRole(),
+                    user.getUserRole()
+            );
+        }
 
         return userMapper.toMinimalUserResponseDTO(user);
     }

@@ -28,6 +28,11 @@ public interface UserControllerSpecs {
     @ApiResponseBusinessRuleException
     ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request);
 
+    @Operation(summary = "update user")
+    @ApiResponse(responseCode = "204", description = "ok")
+    @ApiResponseBadRequest
+    ResponseEntity<Void> updateUser(@PathVariable UUID userId, @RequestBody @Valid UpdateUserRequestDTO request);
+
     @Operation(summary = "Find user by id")
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(schema = @Schema(implementation = MinimalUserResponseDTO.class)))
@@ -40,13 +45,8 @@ public interface UserControllerSpecs {
     @ApiResponseBadRequest
     ResponseEntity<List<MinimalUserResponseDTO>> listUsers();
 
-    @Operation(summary = "update user")
-    @ApiResponse(responseCode = "204", description = "ok")
-    @ApiResponseBadRequest
-    void updateUser(@RequestBody UpdateUserRequestDTO request);
-
     @Operation(summary = "Delete user")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
-    void delete(@PathVariable UUID userId);
+    ResponseEntity<Void> delete(@PathVariable UUID userId);
 }

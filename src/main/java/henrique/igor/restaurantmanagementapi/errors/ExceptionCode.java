@@ -7,7 +7,8 @@ public enum ExceptionCode {
     UNAUTHORIZED,
     BAD_CREDENTIALS,
     INVALID_CREDENTIALS,
-    FORBIDDEN;
+    FORBIDDEN,
+    OPERATION_NOT_ALLOWED;
 
 
     public String getExceptionIndex(){

@@ -1,7 +1,6 @@
 package henrique.igor.restaurantmanagementapi.rest.specs;
 
-import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.CreateDishRequestDTO;
-import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.FindDishesByFilterRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.*;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.pagination.PageableResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
@@ -29,6 +28,11 @@ public interface DishControllerSpecs {
     @ApiResponseBusinessRuleException
     ResponseEntity<DishResponseDTO> createDish(@RequestBody @Valid CreateDishRequestDTO request);
 
+    @Operation(summary = "Update dish")
+    @ApiResponse(responseCode = "204", description = "ok")
+    @ApiResponseBadRequest
+    ResponseEntity<Void> update(@PathVariable UUID dishId, @RequestBody @Valid UpdateDishRequestDTO request);
+
     @Operation(summary = "Find dish by id")
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(schema = @Schema(implementation = DishResponseDTO.class)))
@@ -52,5 +56,5 @@ public interface DishControllerSpecs {
     @Operation(summary = "Delete dish")
     @ApiResponse(responseCode = "204", description = "ok")
     @ApiResponseBadRequest
-    void delete(@PathVariable UUID dishId);
+    public ResponseEntity<Void> delete(@PathVariable UUID dishId);
 }

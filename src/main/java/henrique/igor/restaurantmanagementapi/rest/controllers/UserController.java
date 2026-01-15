@@ -22,16 +22,22 @@ import java.util.UUID;
 public class UserController implements UserControllerSpecs {
 
     private final CreateUserUseCase createUserUseCase;
-    private final DeleteUserByIdUseCase deleteUserByIdUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
     private final FindUserByIdUseCase findUserByIdUseCase;
     private final ListUsersUseCase listUsersUseCase;
-    private final UpdateUserUseCase updateUserUseCase;
+    private final DeleteUserByIdUseCase deleteUserByIdUseCase;
 
-    @PostMapping("/create")
+    @PostMapping()
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid CreateUserRequestDTO request){
         UserResponseDTO response = createUserUseCase.execute(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<Void> updateUser(@PathVariable UUID userId, @RequestBody @Valid UpdateUserRequestDTO request){
+        updateUserUseCase.execute(request, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{userId}")
@@ -40,21 +46,16 @@ public class UserController implements UserControllerSpecs {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/list-users")
+    @GetMapping()
     public ResponseEntity<List<MinimalUserResponseDTO>> listUsers(){
         List<MinimalUserResponseDTO> response = listUsersUseCase.execute();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/update")
+    @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public void updateUser(@RequestBody UpdateUserRequestDTO request){
-        updateUserUseCase.execute(request);
-    }
-
-    @DeleteMapping("/delete/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public void delete(@PathVariable UUID userId){
+    public ResponseEntity<Void> delete(@PathVariable UUID userId){
         deleteUserByIdUseCase.execute(userId);
+        return ResponseEntity.noContent().build();
     }
 }
