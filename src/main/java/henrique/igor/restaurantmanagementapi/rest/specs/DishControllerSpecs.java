@@ -1,7 +1,9 @@
 package henrique.igor.restaurantmanagementapi.rest.specs;
 
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.CreateDishRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.FindDishesByFilterRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.pagination.PageableResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.response.MinimalUserResponseDTO;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBadRequest;
 import henrique.igor.restaurantmanagementapi.rest.specs.commons.ApiResponseBusinessRuleException;
@@ -11,9 +13,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +34,14 @@ public interface DishControllerSpecs {
             content = @Content(schema = @Schema(implementation = DishResponseDTO.class)))
     @ApiResponseBadRequest
     ResponseEntity<DishResponseDTO> findDish(@PathVariable UUID dishId);
+
+    @Operation(summary = "Find dishes by filters with pagination")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = PageableResponseDTO.class)))
+    @ApiResponseBadRequest
+    ResponseEntity<PageableResponseDTO<DishResponseDTO>> findByFilter(
+            @ParameterObject @ModelAttribute @Valid FindDishesByFilterRequestDTO request
+    );
 
     @Operation(summary = "List all dishes")
     @ApiResponse(responseCode = "200", description = "OK",

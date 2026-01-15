@@ -35,6 +35,9 @@ public class Dish {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(nullable = false)
+    private boolean isEnabled;
+
     private String description;
 
     //TODO - add images
