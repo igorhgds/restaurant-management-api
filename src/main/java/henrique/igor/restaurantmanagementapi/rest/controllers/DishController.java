@@ -1,7 +1,6 @@
 package henrique.igor.restaurantmanagementapi.rest.controllers;
 
-import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.CreateDishRequestDTO;
-import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.FindDishesByFilterRequestDTO;
+import henrique.igor.restaurantmanagementapi.entities.dtos.dish.request.*;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.pagination.PageableResponseDTO;
 import henrique.igor.restaurantmanagementapi.rest.specs.DishControllerSpecs;
@@ -23,16 +22,24 @@ import java.util.UUID;
 public class DishController implements DishControllerSpecs {
 
     private final CreateDishUseCase createDishUseCase;
-    private final DeleteDishByIdUseCase deleteDishByIdUseCase;
+    private final UpdateDishUseCase updateDishUseCase;
     private final FindDishByIdUseCase findDishByIdUseCase;
-    private final ListDishesUseCase listDishesUseCase;
     private final FindDishesByFilterUseCase findDishesByFilterUseCase;
+    private final ListDishesUseCase listDishesUseCase;
+    private final DeleteDishByIdUseCase deleteDishByIdUseCase;
 
-    @PostMapping("/create")
+    @PostMapping()
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<DishResponseDTO> createDish(@RequestBody @Valid CreateDishRequestDTO request){
         DishResponseDTO response = createDishUseCase.execute(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{dishId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<Void> update(@PathVariable UUID dishId, @RequestBody @Valid UpdateDishRequestDTO request){
+        updateDishUseCase.execute(request, dishId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{dishId}")
@@ -40,20 +47,21 @@ public class DishController implements DishControllerSpecs {
         return ResponseEntity.ok(findDishByIdUseCase.execute(dishId));
     }
 
-    @GetMapping
+    @GetMapping("/filter")
     public ResponseEntity<PageableResponseDTO<DishResponseDTO>> findByFilter(
             @ParameterObject @ModelAttribute @Valid FindDishesByFilterRequestDTO request) {
-        return ResponseEntity.ok(this.findDishesByFilterUseCase.findByFilters(request));
+        return ResponseEntity.ok(this.findDishesByFilterUseCase.execute(request));
     }
 
-    @GetMapping("/list")
+    @GetMapping()
     public ResponseEntity<List<DishResponseDTO>> listDishes(){
         return ResponseEntity.ok(listDishesUseCase.execute());
     }
 
-    @DeleteMapping("delele/{dishId}")
+    @DeleteMapping("/{dishId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public void delete(@PathVariable UUID dishId){
+    public ResponseEntity<Void> delete(@PathVariable UUID dishId){
         deleteDishByIdUseCase.execute(dishId);
+        return ResponseEntity.noContent().build();
     }
 }

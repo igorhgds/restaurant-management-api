@@ -49,4 +49,22 @@ public class Dish {
     @LastModifiedDate
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    public void updateInfo(String name, BigDecimal price, Category category, Boolean isEnabled, String description) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (price != null && price.compareTo(BigDecimal.ZERO) > 0) {
+            this.price = price;
+        }
+        if (category != null) {
+            this.category = category;
+        }
+        if (isEnabled != null) {
+            this.isEnabled = isEnabled;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+    }
 }

@@ -18,7 +18,7 @@ public class FindDishesByFilterUseCase {
     private final DishJpaRepository dishRepository;
     private final DishStructMapper mapper;
 
-    public PageableResponseDTO<DishResponseDTO> findByFilters(FindDishesByFilterRequestDTO filters) {
+    public PageableResponseDTO<DishResponseDTO> execute(FindDishesByFilterRequestDTO filters) {
 
         var pageable = PageRequest.of(
                 filters.getPage(),

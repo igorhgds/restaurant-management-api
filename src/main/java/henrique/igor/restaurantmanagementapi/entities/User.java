@@ -49,4 +49,18 @@ public class User {
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
+    public void updateInfo(String name, String email, UserRole role, Boolean isEnabled){
+        if (name != null && !name.isBlank()) {
+            this.username = name;
+        }
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (role != null) {
+            this.userRole = role;
+        }
+        if (isEnabled != null) {
+            this.isEnabled = isEnabled;
+        }
+    }
 }

@@ -3,6 +3,7 @@ package henrique.igor.restaurantmanagementapi.usecases.user;
 import henrique.igor.restaurantmanagementapi.entities.User;
 import henrique.igor.restaurantmanagementapi.entities.dtos.user.request.UpdateUserRequestDTO;
 import henrique.igor.restaurantmanagementapi.enums.UserRole;
+import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.EntityNotFoundException;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
 import henrique.igor.restaurantmanagementapi.services.AuthenticationContextService;
@@ -18,8 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateUserUseCaseTest {
@@ -35,51 +35,110 @@ public class UpdateUserUseCaseTest {
     private UpdateUserUseCase updateUserUseCase;
 
     private User loggedUser;
-    private UUID userId;
     private User targetUser;
+    private UUID targetUserId;
 
     @BeforeEach
     void setUp() {
         loggedUser = new User();
+        loggedUser.setUserId(UUID.randomUUID());
         loggedUser.setUserRole(UserRole.ADMIN);
 
-        userId = UUID.randomUUID();
-
+        targetUserId = UUID.randomUUID();
         targetUser = new User();
+        targetUser.setUserId(targetUserId);
         targetUser.setUserRole(UserRole.MANAGER);
     }
 
     @Test
-    void shouldUpdateEnabledOnly(){
+    void shouldUpdateEnabledStatus_WhenAdminUpdatesManager() {
+        // Arrange
         when(authService.getAutheticatedUser()).thenReturn(loggedUser);
-        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(targetUser));
+        when(userRepository.findByUserId(targetUserId)).thenReturn(Optional.of(targetUser));
 
-        UpdateUserRequestDTO request = new UpdateUserRequestDTO(userId, null, false);
-        updateUserUseCase.execute(request);
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO(null, null, null, false);
 
+        // Act
+        updateUserUseCase.execute(request, targetUserId);
+
+        // Assert
         assertFalse(targetUser.isEnabled());
+
+        // Verifica se validou hierarquia (já que IDs são diferentes)
         verify(validateRoleHierarchy).execute(loggedUser.getUserRole(), targetUser.getUserRole());
     }
 
     @Test
-    void shouldUpdateUserRoleOnly(){
+    void shouldUpdateUserRole_AndValidateHierarchyTwice() {
+        // Arrange
         when(authService.getAutheticatedUser()).thenReturn(loggedUser);
-        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(targetUser));
+        when(userRepository.findByUserId(targetUserId)).thenReturn(Optional.of(targetUser));
 
-        UpdateUserRequestDTO request = new UpdateUserRequestDTO(userId, UserRole.MANAGER, null);
-        updateUserUseCase.execute(request);
+        // Admin transformando Manager em Waiter
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO(null, null, UserRole.WAITER, null);
 
-        assertEquals(UserRole.MANAGER, targetUser.getUserRole());
-        verify(validateRoleHierarchy).execute(loggedUser.getUserRole(), targetUser.getUserRole());
+        // Act
+        updateUserUseCase.execute(request, targetUserId);
+
+        // Assert
+        assertEquals(UserRole.WAITER, targetUser.getUserRole());
+
+        // Verifica validação 1: Posso mexer no alvo?
+        verify(validateRoleHierarchy).execute(loggedUser.getUserRole(), UserRole.MANAGER);
+
+        // Verifica validação 2: Posso dar esse cargo novo?
+        verify(validateRoleHierarchy).execute(loggedUser.getUserRole(), UserRole.WAITER);
+    }
+
+    @Test
+    void shouldThrowException_WhenSelfDeactivationAttempt() {
+        // ARRANGE
+        // 1. O usuário precisa começar ATIVO para testarmos se ele NÃO foi desativado
+        loggedUser.setEnabled(true);
+
+        when(authService.getAutheticatedUser()).thenReturn(loggedUser);
+        when(userRepository.findByUserId(loggedUser.getUserId())).thenReturn(Optional.of(loggedUser));
+
+        // Tenta desativar (isEnabled = false)
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO(null, null, null, false);
+
+        // ACT & ASSERT
+        // Garante que o erro estoura
+        assertThrows(BusinessRuleException.class, () ->
+                updateUserUseCase.execute(request, loggedUser.getUserId())
+        );
+
+        // Garante que o usuário CONTINUA ativo (o status não mudou)
+        assertTrue(loggedUser.isEnabled());
+    }
+
+    @Test
+    void shouldUpdateSelfInfo_WithoutCallingHierarchyCheck() {
+        // Arrange - Usuário editando o próprio nome
+        when(authService.getAutheticatedUser()).thenReturn(loggedUser);
+        when(userRepository.findByUserId(loggedUser.getUserId())).thenReturn(Optional.of(loggedUser));
+
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO("Novo Nome", null, null, null);
+
+        // Act
+        updateUserUseCase.execute(request, loggedUser.getUserId());
+
+        // Assert
+        assertEquals("Novo Nome", loggedUser.getUsername());
+
+        // IMPORTANTE: Como é ele mesmo, NÃO deve chamar o validador de hierarquia
+        verify(validateRoleHierarchy, never()).execute(any(), any());
     }
 
     @Test
     void shouldThrowWhenUserNotFound() {
-        UUID userId = UUID.randomUUID();
-        when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(authService.getAutheticatedUser()).thenReturn(loggedUser);
+        when(userRepository.findByUserId(targetUserId)).thenReturn(Optional.empty());
 
-        UpdateUserRequestDTO request = new UpdateUserRequestDTO(userId, UserRole.ADMIN, true);
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO(null, null, UserRole.ADMIN, true);
 
-        assertThrows(EntityNotFoundException.class, () -> updateUserUseCase.execute(request));
+        assertThrows(EntityNotFoundException.class, () ->
+                updateUserUseCase.execute(request, targetUserId)
+        );
     }
 }
