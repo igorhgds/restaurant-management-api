@@ -25,6 +25,7 @@ public class CreateDishUseCase {
         dish.setPrice(request.price());
         dish.setCategory(request.category());
         dish.setDescription(request.description());
+        dish.setEnabled(request.isEnabled());
 
         Dish saved = dishRepository.save(dish);
         return new DishResponseDTO(saved);

@@ -10,6 +10,7 @@ public record CreateDishRequestDTO(
         @NotBlank String name,
         @NotNull BigDecimal price,
         @NotNull Category category,
+        @NotNull boolean isEnabled,
         String description
 ) {
 }

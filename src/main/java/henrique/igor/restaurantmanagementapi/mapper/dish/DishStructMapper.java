@@ -1,4 +1,4 @@
-package henrique.igor.restaurantmanagementapi.mapper.user;
+package henrique.igor.restaurantmanagementapi.mapper.dish;
 
 import henrique.igor.restaurantmanagementapi.entities.Dish;
 import henrique.igor.restaurantmanagementapi.entities.dtos.dish.response.DishResponseDTO;
