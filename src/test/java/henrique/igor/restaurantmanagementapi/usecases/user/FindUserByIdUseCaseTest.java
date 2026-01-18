@@ -10,18 +10,20 @@ import henrique.igor.restaurantmanagementapi.mapper.user.UserStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.user.UserJpaRepository;
 import henrique.igor.restaurantmanagementapi.services.AuthenticationContextService;
 import henrique.igor.restaurantmanagementapi.util.ValidateRoleHierarchy;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 public class FindUserByIdUseCaseTest {
@@ -38,68 +40,83 @@ public class FindUserByIdUseCaseTest {
     @InjectMocks
     private FindUserByIdUseCase findUserByIdUseCase;
 
-    private User loggedAdmin;
     private UUID userId;
-    private User targetUser;
+    private User user;
 
     @BeforeEach
     void setUp() {
-        loggedAdmin = new User();
-        loggedAdmin.setUserRole(UserRole.ADMIN);
-
         userId = UUID.randomUUID();
-
-        targetUser = new User();
-        targetUser.setUserRole(UserRole.MANAGER);
+        user = new User();
+        user.setUserId(userId);
+        user.setUserRole(UserRole.WAITER);
     }
 
     @Test
-    void shouldReturnUserWhenHierarchyValid(){
-        when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
-        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(targetUser));
-        doNothing().when(validateRoleHierarchy).execute(loggedAdmin.getUserRole(), targetUser.getUserRole());
-
-        MinimalUserResponseDTO dto = new MinimalUserResponseDTO(
-                "username", targetUser.getUserRole());
-        when(userMapper.toMinimalUserResponseDTO(targetUser)).thenReturn(dto);
-
-        MinimalUserResponseDTO result = findUserByIdUseCase.execute(userId);
-
-        assertNotNull(result);
-        assertEquals(dto, result);
-
-        verify(userRepository).findByUserId(userId);
-        verify(validateRoleHierarchy).execute(loggedAdmin.getUserRole(), targetUser.getUserRole());
-        verify(userMapper).toMinimalUserResponseDTO(targetUser);
-    }
-
-    @Test
-    void shouldThrowEntityNotFoundWhenUserDoesNotExist() {
-        when(authService.getAutheticatedUser()).thenReturn(loggedAdmin);
+    @DisplayName("An exception should be thrown when the user is not found.")
+    void shouldThrowExceptionWhenUserNotFound(){
+        when(authService.getAutheticatedUser()).thenReturn(user);
         when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
-                () -> findUserByIdUseCase.execute(userId));
+        assertThrows(EntityNotFoundException.class, () -> findUserByIdUseCase.execute(userId));
+
+        verifyNoInteractions(userMapper);
     }
 
     @Test
-    void shouldThrowBusinessRuleExceptionWhenHierarchyInvalid() {
-        User managerUser = new User();
-        managerUser.setUserRole(UserRole.MANAGER);
+    @DisplayName("Should return the user without validating the hierarchy when the user searches for themselves.")
+    void shouldReturnUserWithoutValidatingHierarchyWhenSearchingSelf(){
+        when(authService.getAutheticatedUser()).thenReturn(user);
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(userMapper.toMinimalUserResponseDTO(user)).thenReturn(new MinimalUserResponseDTO("username", UserRole.WAITER));
 
-        User targetAdmin = new User();
-        targetAdmin.setUserRole(UserRole.ADMIN);
+        var result = findUserByIdUseCase.execute(userId);
 
-        when(authService.getAutheticatedUser()).thenReturn(managerUser);
-        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(targetAdmin));
+        assertNotNull(result);
+
+        verifyNoInteractions(validateRoleHierarchy);
+    }
+
+    @Test
+    @DisplayName("Hierarchy must be validated when a user searches for another user.")
+    void shouldValidateHierarchyWhenSearchingOtherUser() {
+        User loggedUser = new User();
+        loggedUser.setUserId(UUID.randomUUID());
+        loggedUser.setUserRole(UserRole.MANAGER);
+
+        when(authService.getAutheticatedUser()).thenReturn(loggedUser);
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(userMapper.toMinimalUserResponseDTO(user)).thenReturn(new MinimalUserResponseDTO("username", UserRole.WAITER));
+
+        findUserByIdUseCase.execute(userId);
+
+        verify(validateRoleHierarchy, times(1))
+                .execute(loggedUser.getUserRole(), user.getUserRole());
+    }
+
+    @Test
+    @DisplayName("An exception should be thrown when the role hierarchy is invalid.")
+    void shouldThrowExceptionWhenRoleHierarchyIsInvalid() {
+        User loggedUser = new User();
+        loggedUser.setUserId(UUID.randomUUID());
+        loggedUser.setUserRole(UserRole.WAITER);
+
+        User targetUser = new User();
+        targetUser.setUserId(userId);
+        targetUser.setUserRole(UserRole.ADMIN);
+
+        when(authService.getAutheticatedUser()).thenReturn(loggedUser);
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(targetUser));
+
+
         doThrow(new BusinessRuleException(ExceptionCode.FORBIDDEN))
-                .when(validateRoleHierarchy).execute(managerUser.getUserRole(), targetAdmin.getUserRole());
+                .when(validateRoleHierarchy)
+                .execute(loggedUser.getUserRole(), targetUser.getUserRole());
 
-        BusinessRuleException ex = assertThrows(
-                BusinessRuleException.class,
-                () -> findUserByIdUseCase.execute(userId)
-        );
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class,
+                () -> findUserByIdUseCase.execute(userId));
 
-        assertEquals(ExceptionCode.FORBIDDEN, ex.getCode());
+        Assertions.assertEquals(ExceptionCode.FORBIDDEN, exception.getCode());
+
+        verifyNoInteractions(userMapper);
     }
 }
