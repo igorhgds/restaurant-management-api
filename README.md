@@ -1,5 +1,9 @@
 # 🍽️ Restaurant Management API
 
+Nota: Este projeto foi desenvolvido para fins de estudo durante a minha preparação para o mercado. Atualmente, pausei o desenvolvimento para focar na minha atuação profissional como FullStack na Sankhya. O código permanece aqui como histórico do meu aprendizado.
+
+![Status do Projeto](https://img.shields.io/badge/Status-Arquivado_(Foco_em_Carreira)-lightgrey)
+
 > 🚧 **Projeto em Construção** - Foco atual: Expansão das regras de negócio (Pedidos e Mesas).
 
 API REST robusta desenvolvida com foco em **Clean Architecture**. O objetivo é desacoplar as regras de negócio de frameworks e bibliotecas, garantindo um código testável, sustentável e de fácil manutenção.
