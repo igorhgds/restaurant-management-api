@@ -1,0 +1,110 @@
+Enum user_role{
+  ADMIN
+  MANAGER
+  WAITER
+}
+
+Table user{
+  id UUID [primary key]
+  username varchar(200) [not null]
+  email varchar(200) [not null]
+  password varchar(50) [not null]
+  password_recovery_code varchar(4) [null]
+  user_role user_role [not null]
+  is_enabled boolean [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Enum table_status{
+  FREE
+  OCCUPIED
+  CLEANING
+}
+
+Enum table_location{
+  INDOOR
+  OUTDOOR
+}
+
+Table table{
+  id UUID [primary key]
+  number int [not null]
+  capacity int [not null]
+  status table_status [not null]
+  location table_location [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table menu{
+  id UUID [primary key]
+  name varchar(50) [not null]
+  description text
+  active boolean [not null]
+  start_date timestamp
+  end_date timestamp
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table menu_dishes{
+  menu_id uuid [ref: > menu.id, not null]
+  dish_id uuid [ref: > dish.id, not null]
+}
+
+Enum category{
+  MAIN_DISHES
+  SIDE_DISHES
+  BURGERS
+  APPETIZERS
+  DESSERTS
+  DRINKS
+}
+
+Table dish{
+  id UUID [primary key]
+  name varchar(50) [not null]
+  price decimal [not null]
+  category category [not null]
+  description text
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table dish_images{ 
+  dish_id uuid [ref: > dish.id, not null]
+  image_id uuid [ref: > image.id, not null]
+}
+
+Table image{
+  id uuid [primary key]
+  uri varchar [not null]
+  original_filename varchar [not null]
+}
+
+Enum order_status{
+  PREPARING
+  CLOSED
+  PAID
+}
+ 
+Table order{
+  id uuid [primary key]
+  status order_status [not null]
+  price decimal [not null]
+  table_id uuid [ref: > table.id, not null]
+  waiter_id uuid [ref: < user.id, not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table order_item{
+  id uuid [primary key]
+  quantity int [not null]
+  unit_price decimal [not null]
+  subtotal decimal [not null]
+  order_id uuid [ref: > order.id, not null]
+  dish_id uuid [ref : > dish.id, not null]
+}
+     
