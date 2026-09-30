@@ -1,10 +1,12 @@
 package henrique.igor.restaurantmanagementapi.security.config;
 
-import henrique.igor.restaurantmanagementapi.security.dto.RouteDTO;
 import henrique.igor.restaurantmanagementapi.security.filters.AuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,79 +18,43 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.List;
-
 import static henrique.igor.restaurantmanagementapi.enums.UserRole.ADMIN;
-import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final AuthenticationFilter authenticationFilter;
 
-    private static final String[] SWAGGER_RESOURCES = {
-            "/swagger-resources/**",
-            "/v3/api-docs/**",
+    private static final String[] PUBLIC_URLS = {
+            "/auth/login",
+            "/auth/activate",
+            "/auth/generate-password-recovery-code",
+            "/auth/change-password",
+            "/swagger-ui.html",
             "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
             "/docs/**"
     };
 
-    private static final RouteDTO PUBLIC_ROUTES = new RouteDTO()
-            .setPaths(POST, List.of(
-                    "/auth/login"
-            ))
-            .setPaths(PATCH, List.of(
-                    "/auth/login",
-                    "/auth/generate-password-recovery-code",
-                    "/auth/change-password",
-                    "/auth/activate"
-            ))
-            .setPaths(GET, List.of(
-
-            ));
-
-    private static final RouteDTO PRIVATE_ROUTES = new RouteDTO()
-            .setPaths(GET, List.of(
-                    "/users",
-                    "/users/{userId}",
-                    "/dishes",
-                    "/dishes/{dishId}"
-            ))
-            .setPaths(POST, List.of(
-                    "/users",
-                    "/dishes"
-            ))
-            .setPaths(PATCH, List.of(
-                    "/users",
-                    "/users/{userId}",
-                    "/dishes"
-            ))
-            .setPaths(DELETE, List.of(
-                    "/users/{userId}"
-            ));
-
-    private static final RouteDTO ADMIN_ROUTES = new RouteDTO()
-            .setRoles(ADMIN)
-            .setPaths(GET, List.of());
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_MANAGER\nROLE_MANAGER > ROLE_WAITER");
+    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(POST, PUBLIC_ROUTES.getPathsByMethod(POST)).permitAll()
-                        .requestMatchers(PATCH, PUBLIC_ROUTES.getPathsByMethod(PATCH)).permitAll()
-
-                        .requestMatchers(GET, PRIVATE_ROUTES.getPathsByMethod(GET)).authenticated()
-                        .requestMatchers(POST, PRIVATE_ROUTES.getPathsByMethod(POST)).authenticated()
-                        .requestMatchers(PATCH, PRIVATE_ROUTES.getPathsByMethod(PATCH)).authenticated()
-                        .requestMatchers(DELETE, PRIVATE_ROUTES.getPathsByMethod(DELETE)).authenticated()
-
-                        .requestMatchers(SWAGGER_RESOURCES).permitAll()
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -104,3 +70,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
