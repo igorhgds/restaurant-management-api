@@ -4,6 +4,7 @@ import henrique.igor.restaurantmanagementapi.entities.RestaurantTable;
 import henrique.igor.restaurantmanagementapi.entities.dtos.table.request.UpdateTableRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.table.response.TableResponseDTO;
 import henrique.igor.restaurantmanagementapi.enums.TableLocation;
+import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.mapper.table.TableStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.table.RestaurantTableJpaRepository;
@@ -73,7 +74,8 @@ class UpdateTableUseCaseTest {
         when(findTableByIdUseCase.getEntityById(id)).thenReturn(table);
         when(repository.existsByNumberAndTableIdNot(dto.getNumber(), id)).thenReturn(true);
 
-        assertThrows(BusinessRuleException.class, () -> useCase.execute(id, dto));
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> useCase.execute(id, dto));
+        assertEquals(ExceptionCode.DUPLICATED_RESOURCE, exception.getCode());
         verify(repository, never()).save(any());
     }
 }

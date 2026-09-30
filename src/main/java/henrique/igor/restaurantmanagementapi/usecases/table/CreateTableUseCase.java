@@ -5,6 +5,7 @@ import henrique.igor.restaurantmanagementapi.entities.dtos.table.request.CreateT
 import henrique.igor.restaurantmanagementapi.entities.dtos.table.response.TableResponseDTO;
 import henrique.igor.restaurantmanagementapi.enums.TableStatus;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
+import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.mapper.table.TableStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.table.RestaurantTableJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class CreateTableUseCase {
 
     public TableResponseDTO execute(CreateTableRequestDTO dto) {
         if (tableRepository.existsByNumber(dto.getNumber())) {
-            throw new BusinessRuleException("Table number already exists");
+            throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, "table.number.duplicate");
         }
 
         RestaurantTable table = mapper.toEntity(dto);

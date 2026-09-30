@@ -24,6 +24,6 @@ public class FindTableByIdUseCase {
 
     public RestaurantTable getEntityById(UUID id) {
         return tableRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Table not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(RestaurantTable.class));
     }
 }

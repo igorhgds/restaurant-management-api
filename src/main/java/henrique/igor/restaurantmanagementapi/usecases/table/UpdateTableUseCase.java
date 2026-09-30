@@ -4,6 +4,7 @@ import henrique.igor.restaurantmanagementapi.entities.RestaurantTable;
 import henrique.igor.restaurantmanagementapi.entities.dtos.table.request.UpdateTableRequestDTO;
 import henrique.igor.restaurantmanagementapi.entities.dtos.table.response.TableResponseDTO;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
+import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.mapper.table.TableStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.table.RestaurantTableJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class UpdateTableUseCase {
 
         if (dto.getNumber() != null && !dto.getNumber().equals(table.getNumber())) {
             if (tableRepository.existsByNumberAndTableIdNot(dto.getNumber(), id)) {
-                throw new BusinessRuleException("Table number already exists");
+                throw new BusinessRuleException(ExceptionCode.DUPLICATED_RESOURCE, "table.number.duplicate");
             }
             table.setNumber(dto.getNumber());
         }

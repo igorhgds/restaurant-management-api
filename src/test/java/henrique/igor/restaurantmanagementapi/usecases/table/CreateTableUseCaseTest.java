@@ -6,6 +6,7 @@ import henrique.igor.restaurantmanagementapi.entities.dtos.table.response.TableR
 import henrique.igor.restaurantmanagementapi.enums.TableLocation;
 import henrique.igor.restaurantmanagementapi.enums.TableStatus;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
+import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.mapper.table.TableStructMapper;
 import henrique.igor.restaurantmanagementapi.repositories.table.RestaurantTableJpaRepository;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class CreateTableUseCaseTest {
 
         // Act & Assert
         BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> useCase.execute(dto));
-        assertEquals("Table number already exists", exception.getMessage());
+        assertEquals(ExceptionCode.DUPLICATED_RESOURCE, exception.getCode());
         verify(repository, never()).save(any());
     }
 }
