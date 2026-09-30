@@ -37,6 +37,9 @@ public class Order {
     @JoinColumn(name = "waiter_id", nullable = false)
     private User waiter;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<OrderItem> items = new java.util.ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
