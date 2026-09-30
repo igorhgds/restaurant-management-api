@@ -24,7 +24,7 @@ public class UpdateTableUseCase {
 
         if (dto.getNumber() != null && !dto.getNumber().equals(table.getNumber())) {
             if (tableRepository.existsByNumberAndTableIdNot(dto.getNumber(), id)) {
-                throw new BusinessRuleException("Table number already exists");
+                throw new BusinessRuleException(henrique.igor.restaurantmanagementapi.errors.ExceptionCode.DUPLICATED_RESOURCE, "table.number.duplicate");
             }
             table.setNumber(dto.getNumber());
         }

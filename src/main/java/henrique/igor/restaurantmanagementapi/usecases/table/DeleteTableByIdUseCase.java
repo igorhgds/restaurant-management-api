@@ -20,7 +20,7 @@ public class DeleteTableByIdUseCase {
         RestaurantTable table = findTableByIdUseCase.getEntityById(id);
 
         if (table.getStatus() == TableStatus.OCCUPIED) {
-            throw new BusinessRuleException("Cannot delete an occupied table");
+            throw new BusinessRuleException(henrique.igor.restaurantmanagementapi.errors.ExceptionCode.OPERATION_NOT_ALLOWED, "table.delete.occupied");
         }
 
         tableRepository.delete(table);

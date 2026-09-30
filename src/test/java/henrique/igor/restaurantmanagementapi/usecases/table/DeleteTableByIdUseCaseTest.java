@@ -2,6 +2,7 @@ package henrique.igor.restaurantmanagementapi.usecases.table;
 
 import henrique.igor.restaurantmanagementapi.entities.RestaurantTable;
 import henrique.igor.restaurantmanagementapi.enums.TableStatus;
+import henrique.igor.restaurantmanagementapi.errors.ExceptionCode;
 import henrique.igor.restaurantmanagementapi.errors.exceptions.BusinessRuleException;
 import henrique.igor.restaurantmanagementapi.repositories.table.RestaurantTableJpaRepository;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -49,7 +51,8 @@ class DeleteTableByIdUseCaseTest {
 
         when(findTableByIdUseCase.getEntityById(id)).thenReturn(table);
 
-        assertThrows(BusinessRuleException.class, () -> useCase.execute(id));
-        verify(repository, never()).delete(any());
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> useCase.execute(id));
+        assertEquals(ExceptionCode.OPERATION_NOT_ALLOWED, exception.getCode());
+        verify(repository, never()).delete(any(RestaurantTable.class));
     }
 }

@@ -70,7 +70,7 @@ class CreateTableUseCaseTest {
 
         // Act & Assert
         BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> useCase.execute(dto));
-        assertEquals("Table number already exists", exception.getMessage());
+        assertEquals(henrique.igor.restaurantmanagementapi.errors.ExceptionCode.DUPLICATED_RESOURCE, exception.getCode());
         verify(repository, never()).save(any());
     }
 }

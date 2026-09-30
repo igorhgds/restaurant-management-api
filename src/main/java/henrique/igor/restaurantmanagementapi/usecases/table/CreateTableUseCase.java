@@ -19,7 +19,7 @@ public class CreateTableUseCase {
 
     public TableResponseDTO execute(CreateTableRequestDTO dto) {
         if (tableRepository.existsByNumber(dto.getNumber())) {
-            throw new BusinessRuleException("Table number already exists");
+            throw new BusinessRuleException(henrique.igor.restaurantmanagementapi.errors.ExceptionCode.DUPLICATED_RESOURCE, "table.number.duplicate");
         }
 
         RestaurantTable table = mapper.toEntity(dto);

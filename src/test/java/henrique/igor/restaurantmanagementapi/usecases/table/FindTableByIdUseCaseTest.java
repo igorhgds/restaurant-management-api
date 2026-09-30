@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -49,6 +50,7 @@ class FindTableByIdUseCaseTest {
         UUID id = UUID.randomUUID();
         when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> useCase.execute(id));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> useCase.execute(id));
+        assertEquals(RestaurantTable.class, exception.getEntityClass());
     }
 }
