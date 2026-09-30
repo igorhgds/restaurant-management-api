@@ -1,6 +1,6 @@
 # AGENTS.md — Restaurant Management API
 
-> Compact guide for agents working in this Spring Boot 3.5 / Java 21 / Maven project.
+> Compact guide for agents working in this Spring Boot 3.5.7 / Java 21 / Maven project.
 
 ---
 
@@ -10,7 +10,7 @@
 # Run application (requires PostgreSQL on localhost:5433 or set DB_URL)
 ./mvnw spring-boot:run
 
-# Run tests
+# Run tests (Runs 110+ tests using H2 in-memory test profile automatically)
 ./mvnw test
 
 # Build JAR
@@ -37,18 +37,23 @@
 src/main/java/henrique/igor/restaurantmanagementapi/
 ├── usecases/
 │   ├── auth/          # Login, ActivateAccount, GeneratePasswordRecoveryCode, ChangePassword
-│   ├── user/          # CRUD + role hierarchy validation
-│   └── dish/          # CRUD + filtering
-├── entities/          # JPA entities (User, Dish)
+│   ├── user/          # Create, Update, FindById, List + Role Hierarchy validation
+│   ├── dish/          # Create, Update, FindById, List, Filter, Delete
+│   │   └── image/     # UploadDishImage, DeleteDishImage, ListDishImages
+│   ├── menu/          # Create, Update, FindById, List, Filter, Delete
+│   ├── table/         # Create, Update, UpdateStatus, FindById, List, Filter, Delete
+│   └── order/         # CreateOrder, AddOrderItem, RemoveOrderItem, UpdateOrderStatus, FindById, Filter
+├── entities/          # JPA entities (User, Dish, Menu, MenuDish, RestaurantTable, Order, OrderItem, Image, DishImage)
+├── enums/             # UserRole, Category, OrderStatus, TableStatus, TableLocation
 ├── repositories/      # Spring Data JPA repositories + Specs
-├── mappers/           # MapStruct mappers (generated to target/generated-sources)
+├── mapper/            # MapStruct mappers (generated to target/generated-sources)
 ├── security/          # JWT, filter, SecurityConfig (stateless, RBAC)
 ├── rest/
-│   ├── controllers/   # Thin controllers delegating to UseCases
-│   └── specs/         # OpenAPI/Swagger annotations
-├── services/          # Cross-cutting (Email, RandomCode, AuthContext)
+│   ├── controllers/   # AuthController, UserController, DishController, MenuController, TableController, DishImageController, OrderController
+│   └── specs/         # OpenAPI/Swagger annotations for all controllers
+├── services/          # EmailService, RandomCodeService, AuthContextService, ImageStorageService (LocalStorageService)
 ├── errors/            # Global exception handler + custom exceptions
-└── config/            # Swagger, etc.
+└── config/            # SwaggerConfig, etc.
 ```
 
 **Key principle**: Controllers → UseCases → Repositories. No business logic in controllers.
@@ -57,12 +62,11 @@ src/main/java/henrique/igor/restaurantmanagementapi/
 
 ## Testing
 
-- **Framework**: JUnit 5 + Mockito
-- **Scope**: Unit tests for Use Cases only (mock all dependencies)
+- **Framework**: JUnit 5 + Mockito + H2 Database
+- **Scope**: Unit tests for Use Cases + Context tests using `@ActiveProfiles("test")`
 - **Run all**: `./mvnw test`
 - **Run one**: `./mvnw test -Dtest=ClassName`
-- **Test DB**: H2 in-memory (configured in test profile automatically)
-- **No integration tests** yet — only unit tests for use cases
+- **Test Profile**: `src/test/resources/application-test.yaml` configures H2 in-memory DB in PostgreSQL compatibility mode.
 
 ---
 
@@ -72,19 +76,22 @@ src/main/java/henrique/igor/restaurantmanagementapi/
 - `V1__create_users_table.sql` — users table (UUID PK, roles, enable flag)
 - `V2__create_dishes_table.sql` — dishes table (UUID PK, category, price)
 - `V3__add_isEnabled_to_dishes_table.sql` — adds `is_enabled` to dishes
+- `V4__create_menu_and_menu_dishes_tables.sql` — menu and menu_dishes tables
+- `V5__create_missing_tables.sql` — restaurant_table, image, dish_images, restaurant_order, order_item tables
 - **Naming**: `V{number}__{description}.sql` — Flyway runs in version order
 
 ---
 
-## Security
+## Security & Documentation
 
 - **JWT stateless** authentication (`auth0/java-jwt`)
 - **Public routes** (no auth):
   - `POST /auth/login`
   - `PATCH /auth/login`, `/auth/generate-password-recovery-code`, `/auth/change-password`, `/auth/activate`
-- **Private routes** (require valid JWT): `/users/**`, `/dishes/**`
-- **RBAC**: `ADMIN`, `MANAGER`, `WAITER` — enforced in `ValidateRoleHierarchy` (e.g., MANAGER cannot create ADMIN)
-- **Swagger/OpenAPI** at `/swagger-ui.html` (public)
+  - `/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`
+- **Private routes** (require valid JWT): `/users/**`, `/dishes/**`, `/menus/**`, `/tables/**`, `/orders/**`
+- **RBAC**: `ADMIN`, `MANAGER`, `WAITER` — enforced in `ValidateRoleHierarchy` and `@PreAuthorize`
+- **Swagger/OpenAPI UI** accessible at `/swagger-ui.html` when app is running.
 
 ---
 
@@ -109,20 +116,11 @@ src/main/java/henrique/igor/restaurantmanagementapi/
 
 ---
 
-## Gotchas
-
-1. **PostgreSQL required** for `spring-boot:run` — no embedded DB for main profile
-2. **MapStruct + Lombok** need `lombok-mapstruct-binding` processor (configured in pom.xml)
-3. **Role hierarchy** validated in `CreateUserUseCase` / `UpdateUserUseCase` via `ValidateRoleHierarchy`
-4. **EmailService** is mocked in tests; `MockEmailService` exists for dev
-5. **JWT secret must be changed** in production (`JWT_SECRET` env var)
-6. **No CI/CD pipeline** configured (no `.github/workflows/`)
-
----
-
 ## Project Status
 
-- ✅ Auth & Users (complete with tests)
-- 🚧 Dishes CRUD (done, tests pending)
-- ⏳ Tables, Orders — not started
-- 📦 Docker / CI / Swagger — planned
+- ✅ Auth & Users (Complete with UseCases, Controllers, Specs, Tests)
+- ✅ Dishes & Dish Images (Complete with UseCases, Controllers, Specs, Storage, Tests)
+- ✅ Menus (Complete with UseCases, Controllers, Specs, Tests)
+- ✅ Tables (Complete with UseCases, Controllers, Specs, Tests)
+- ✅ Orders & Order Items (Complete with UseCases, Controllers, Specs, Tests)
+- ✅ CI/CD & Test Profile (GitHub Actions workflow + H2 test configuration)
