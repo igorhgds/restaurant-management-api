@@ -1,7 +1,8 @@
 package henrique.igor.restaurantmanagementapi.enums;
 
 public enum TableStatus {
-    FREE,
+    AVAILABLE,
     OCCUPIED,
-    CLEANING
+    RESERVED,
+    OUT_OF_SERVICE
 }
